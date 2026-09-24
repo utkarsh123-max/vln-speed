@@ -1,53 +1,35 @@
-import type {
-  PingSummary,
-  ThroughputSample,
-  ThroughputSummary,
-} from "../types";
-
-import {
-  calculateAverage,
-  calculateJitter,
-} from "../utils/calculateJitter";
+import type { PingSummary, ThroughputSample, ThroughputSummary } from "../types";
+import { calculateAverage, calculateJitter } from "../utils/calculateJitter";
 
 /**
- * Real network measurement utilities.
- *
- * No fake/random speed values are generated.
- * Random bytes are used only as upload payload data.
+ * ---------------------------------------------------------------------
+ * IMPORTANT: everything in this file performs REAL network I/O.
+ * There is no Math.random() standing in for a measurement anywhere here —
+ * random bytes are only ever used as upload *payload* (data that has to
+ * exist to be sent somewhere), never as a fake result.
+ * ---------------------------------------------------------------------
  */
 
-// -----------------------------------------------------------------------------
-// Shared throughput sampler
-// -----------------------------------------------------------------------------
+// ---- shared throughput sampler --------------------------------------
 
 function sampleThroughput(
   getTotalBytes: () => number,
   testStart: number,
   intervalMs: number,
-  onSample?: (sample: ThroughputSample) => void
+  onSample?: (s: ThroughputSample) => void
 ) {
-  let lastBytes = getTotalBytes();
-  let lastTime = performance.now();
-
+  let lastBytes = 0;
+  let lastTime = testStart;
   const samples: ThroughputSample[] = [];
 
   const id = window.setInterval(() => {
     const now = performance.now();
     const bytes = getTotalBytes();
-
-    const deltaBytes = Math.max(0, bytes - lastBytes);
+    const deltaBytes = bytes - lastBytes;
     const deltaTimeSec = (now - lastTime) / 1000;
+    const mbps = deltaTimeSec > 0 ? (deltaBytes * 8) / deltaTimeSec / 1_000_000 : 0;
 
-    const mbps =
-      deltaTimeSec > 0
-        ? (deltaBytes * 8) / deltaTimeSec / 1_000_000
-        : 0;
-
-    const sample: ThroughputSample = {
-      t: now - testStart,
-      mbps,
-    };
-
+    const sample: ThroughputSample = { t: now - testStart, mbps };
     samples.push(sample);
     onSample?.(sample);
 
@@ -61,82 +43,41 @@ function sampleThroughput(
   };
 }
 
-function summarize(
-  samples: ThroughputSample[],
-  totalBytes: number,
-  elapsedSec: number
-): ThroughputSummary {
-  const mbpsValues = samples
-    .map((sample) => sample.mbps)
-    .filter((value) => Number.isFinite(value) && value > 0);
-
-  const avgMbps =
-    elapsedSec > 0
-      ? (totalBytes * 8) / elapsedSec / 1_000_000
-      : 0;
-
+function summarize(samples: ThroughputSample[], totalBytes: number, elapsedSec: number): ThroughputSummary {
+  const mbpsValues = samples.map((s) => s.mbps).filter((v) => v > 0);
+  const avgMbps = elapsedSec > 0 ? (totalBytes * 8) / elapsedSec / 1_000_000 : 0;
   return {
     avgMbps,
-    peakMbps: mbpsValues.length
-      ? Math.max(...mbpsValues)
-      : avgMbps,
-    minMbps: mbpsValues.length
-      ? Math.min(...mbpsValues)
-      : avgMbps,
+    peakMbps: mbpsValues.length ? Math.max(...mbpsValues) : avgMbps,
+    minMbps: mbpsValues.length ? Math.min(...mbpsValues) : avgMbps,
     samples,
   };
 }
 
-// -----------------------------------------------------------------------------
-// Ping / Jitter
-// -----------------------------------------------------------------------------
+// ---- ping / jitter -----------------------------------------------------
 
 export async function runPingTest(
   baseUrl: string,
-  opts: {
-    count?: number;
-    onSample?: (rttMs: number) => void;
-    signal?: AbortSignal;
-  } = {}
+  opts: { count?: number; onSample?: (rttMs: number) => void; signal?: AbortSignal } = {}
 ): Promise<PingSummary> {
   const count = opts.count ?? 14;
   const samples: number[] = [];
 
   for (let i = 0; i < count; i++) {
-    if (opts.signal?.aborted) {
-      break;
-    }
-
+    if (opts.signal?.aborted) break;
     const start = performance.now();
-
     try {
-      const response = await fetch(
-        `${baseUrl}/api/ping?_=${Date.now()}_${i}`,
-        {
-          cache: "no-store",
-          signal: opts.signal,
-        }
-      );
-
-      if (!response.ok) {
-        continue;
-      }
-
+      await fetch(`${baseUrl}/api/ping?_=${Date.now()}_${i}`, {
+        cache: "no-store",
+        signal: opts.signal,
+      });
       const rtt = performance.now() - start;
-
       samples.push(rtt);
       opts.onSample?.(rtt);
     } catch {
-      /*
-       * Failed ping samples are ignored.
-       * This allows the final jitter/average to represent
-       * successful responses rather than failed requests.
-       */
+      // dropped sample — doesn't count toward the average, mirrors real packet loss
     }
-
-    if (i < count - 1) {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
+    await new Promise((r) => setTimeout(r, 50));
   }
 
   if (samples.length === 0) {
@@ -151,275 +92,103 @@ export async function runPingTest(
   };
 }
 
-/**
- * Quick latency measurement used by server selection.
- */
-export async function measureServerLatency(
-  baseUrl: string
-): Promise<number> {
-  const summary = await runPingTest(baseUrl, {
-    count: 3,
-  });
-
+/** Quick 3-sample ping used only for the server selector list, not the main test. */
+export async function measureServerLatency(baseUrl: string): Promise<number> {
+  const summary = await runPingTest(baseUrl, { count: 3 });
   return Math.round(summary.avgMs);
 }
 
-// -----------------------------------------------------------------------------
-// Download
-// -----------------------------------------------------------------------------
+// ---- download ------------------------------------------------------------
 
 export async function runDownloadTest(
   baseUrl: string,
   opts: {
     durationMs?: number;
     parallelStreams?: number;
-    onSample?: (sample: ThroughputSample) => void;
+    onSample?: (s: ThroughputSample) => void;
     signal?: AbortSignal;
   } = {}
 ): Promise<ThroughputSummary> {
   const durationMs = opts.durationMs ?? 8000;
-  const streamCount = Math.max(1, opts.parallelStreams ?? 2);
+  // Single stream by default: on constrained hosting (free tiers) a second
+  // concurrent long-lived stream can get cut by the platform, and since we
+  // no longer let one failing stream kill the whole test (see below), a
+  // single reliable stream beats two streams where one silently dies.
+  const streamCount = opts.parallelStreams ?? 1;
 
   let totalBytes = 0;
-
   const testStart = performance.now();
-
   const controller = new AbortController();
+  const externalAbort = () => controller.abort();
+  opts.signal?.addEventListener("abort", externalAbort);
+  const safetyTimer = window.setTimeout(() => controller.abort(), durationMs + 4000);
 
-  /*
-   * Abort all download streams when the caller cancels the test.
-   */
-  const externalAbort = () => {
-    controller.abort();
-  };
-
-  if (opts.signal?.aborted) {
-    controller.abort();
-  } else {
-    opts.signal?.addEventListener("abort", externalAbort, {
-      once: true,
-    });
-  }
-
-  /*
-   * Safety timeout prevents a stuck connection from hanging forever.
-   */
-  const safetyTimer = window.setTimeout(() => {
-    controller.abort();
-  }, durationMs + 4000);
-
-  const sampler = sampleThroughput(
-    () => totalBytes,
-    testStart,
-    200,
-    opts.onSample
-  );
+  const sampler = sampleThroughput(() => totalBytes, testStart, 200, opts.onSample);
 
   const readStream = async (index: number) => {
-    const response = await fetch(
-      `${baseUrl}/api/download?duration=${durationMs}&s=${index}_${Date.now()}`,
-      {
-        cache: "no-store",
-        signal: controller.signal,
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `Download stream ${index} failed with status ${response.status}`
-      );
-    }
-
-    if (!response.body) {
-      throw new Error(
-        `Download stream ${index} has no response body`
-      );
-    }
-
-    const reader = response.body.getReader();
-
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-
-        if (done) {
-          break;
-        }
-
-        if (value) {
-          totalBytes += value.byteLength;
-        }
-
-        if (controller.signal.aborted) {
-          break;
-        }
-      }
-    } finally {
-      /*
-       * Release the reader even if the request is aborted.
-       */
-      try {
-        await reader.cancel();
-      } catch {
-        // Reader may already be closed.
-      }
+    const res = await fetch(`${baseUrl}/api/download?duration=${durationMs}&s=${index}_${Date.now()}`, {
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    if (!res.ok || !res.body) throw new Error(`Download stream ${index} failed`);
+    const reader = res.body.getReader();
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (value) totalBytes += value.byteLength;
     }
   };
 
-  try {
-    await Promise.all(
-      Array.from(
-        { length: streamCount },
-        (_, index) => readStream(index)
-      )
-    );
-  } catch (error) {
-    /*
-     * One stream failing should stop every other active stream.
-     */
-    controller.abort();
+  // Promise.allSettled instead of Promise.all: if one parallel stream gets
+  // cut early (platform limits, a flaky hop, etc.) the test still reports
+  // whatever real throughput the surviving streams measured, instead of
+  // discarding a mostly-successful test over one dropped connection.
+  const results = await Promise.allSettled(Array.from({ length: streamCount }, (_, i) => readStream(i)));
+  window.clearTimeout(safetyTimer);
+  opts.signal?.removeEventListener("abort", externalAbort);
+  sampler.stop();
 
-    if (!opts.signal?.aborted) {
-      throw error;
-    }
-  } finally {
-    window.clearTimeout(safetyTimer);
-
-    opts.signal?.removeEventListener(
-      "abort",
-      externalAbort
-    );
-
-    sampler.stop();
-
-    /*
-     * Make sure no download stream survives the test.
-     */
-    controller.abort();
+  const allFailed = results.every((r) => r.status === "rejected");
+  if (allFailed && totalBytes === 0) {
+    const firstFailure = results.find((r): r is PromiseRejectedResult => r.status === "rejected");
+    throw firstFailure?.reason instanceof Error ? firstFailure.reason : new Error("Download test failed");
   }
 
-  /*
-   * For a normal timed test, use the real measurement duration.
-   * This avoids accidentally extending the calculation because
-   * cleanup happened slightly after the test window.
-   */
-  const elapsedMs = Math.min(
-    performance.now() - testStart,
-    durationMs
-  );
-
-  const elapsedSec = elapsedMs / 1000;
-
-  return summarize(
-    sampler.samples,
-    totalBytes,
-    elapsedSec
-  );
+  const elapsedSec = (performance.now() - testStart) / 1000;
+  return summarize(sampler.samples, totalBytes, elapsedSec);
 }
 
-// -----------------------------------------------------------------------------
-// Upload
-// -----------------------------------------------------------------------------
+// ---- upload ------------------------------------------------------------
 
-/**
- * crypto.getRandomValues() is limited to 65536 bytes per call,
- * so large payloads are filled in chunks.
- *
- * These random bytes are REAL upload data.
- * They are NOT used to generate a fake speed value.
- */
+/** crypto.getRandomValues caps out at 65536 bytes per call, so fill in chunks. */
 function createRandomPayload(sizeBytes: number): Blob {
   const buffer = new Uint8Array(sizeBytes);
-
   const maxChunk = 65536;
-
-  for (
-    let offset = 0;
-    offset < sizeBytes;
-    offset += maxChunk
-  ) {
-    const end = Math.min(
-      offset + maxChunk,
-      sizeBytes
-    );
-
-    crypto.getRandomValues(
-      buffer.subarray(offset, end)
-    );
+  for (let offset = 0; offset < sizeBytes; offset += maxChunk) {
+    const end = Math.min(offset + maxChunk, sizeBytes);
+    crypto.getRandomValues(buffer.subarray(offset, end));
   }
-
-  return new Blob([buffer], {
-    type: "application/octet-stream",
-  });
+  return new Blob([buffer]);
 }
 
 function xhrUpload(
   baseUrl: string,
   payload: Blob,
   onProgress: (loadedBytes: number) => void
-): {
-  promise: Promise<void>;
-  abort: () => void;
-} {
+): { promise: Promise<void>; abort: () => void } {
   const xhr = new XMLHttpRequest();
-
   const promise = new Promise<void>((resolve, reject) => {
-    xhr.open(
-      "POST",
-      `${baseUrl}/api/upload`
-    );
-
-    xhr.setRequestHeader(
-      "Cache-Control",
-      "no-store"
-    );
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        onProgress(event.loaded);
-      }
+    xhr.open("POST", `${baseUrl}/api/upload`);
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(e.loaded);
     };
-
-    xhr.onload = () => {
-      if (
-        xhr.status >= 200 &&
-        xhr.status < 300
-      ) {
-        resolve();
-      } else {
-        reject(
-          new Error(
-            `Upload rejected with status ${xhr.status}`
-          )
-        );
-      }
-    };
-
-    xhr.onerror = () => {
-      reject(new Error("Upload failed"));
-    };
-
-    xhr.ontimeout = () => {
-      reject(new Error("Upload timed out"));
-    };
-
-    xhr.onabort = () => {
-      reject(new Error("Upload aborted"));
-    };
-
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error("Upload rejected")));
+    xhr.onerror = () => reject(new Error("Upload failed"));
+    xhr.onabort = () => reject(new Error("Upload aborted"));
     xhr.send(payload);
   });
-
-  return {
-    promise,
-    abort: () => {
-      if (
-        xhr.readyState !== XMLHttpRequest.DONE
-      ) {
-        xhr.abort();
-      }
-    },
-  };
+  return { promise, abort: () => xhr.abort() };
 }
 
 export async function runUploadTest(
@@ -428,66 +197,26 @@ export async function runUploadTest(
     durationMs?: number;
     parallelStreams?: number;
     chunkSizeBytes?: number;
-    onSample?: (sample: ThroughputSample) => void;
+    onSample?: (s: ThroughputSample) => void;
     signal?: AbortSignal;
   } = {}
 ): Promise<ThroughputSummary> {
   const durationMs = opts.durationMs ?? 7000;
+  const workerCount = opts.parallelStreams ?? 1;
+  const chunkSize = opts.chunkSizeBytes ?? 4 * 1024 * 1024;
+  const payload = createRandomPayload(chunkSize);
 
-  const workerCount = Math.max(
-    1,
-    opts.parallelStreams ?? 2
-  );
-
-  const chunkSize =
-    opts.chunkSizeBytes ??
-    4 * 1024 * 1024;
-
-  const payload =
-    createRandomPayload(chunkSize);
-
-  const workerBytes = new Array<number>(
-    workerCount
-  ).fill(0);
-
-  const activeUploads = new Set<
-    () => void
-  >();
-
+  const workerBytes = new Array(workerCount).fill(0);
   const testStart = performance.now();
-
-  let stopFlag = false;
-
-  const stopAllUploads = () => {
-    stopFlag = true;
-
-    for (const abort of activeUploads) {
-      abort();
-    }
-
-    activeUploads.clear();
-  };
+  let globalStop = false;
 
   const onAbort = () => {
-    stopAllUploads();
+    globalStop = true;
   };
-
-  if (opts.signal?.aborted) {
-    stopFlag = true;
-  } else {
-    opts.signal?.addEventListener(
-      "abort",
-      onAbort,
-      { once: true }
-    );
-  }
+  opts.signal?.addEventListener("abort", onAbort);
 
   const sampler = sampleThroughput(
-    () =>
-      workerBytes.reduce(
-        (total, bytes) => total + bytes,
-        0
-      ),
+    () => workerBytes.reduce((a, b) => a + b, 0),
     testStart,
     200,
     opts.onSample
@@ -495,97 +224,35 @@ export async function runUploadTest(
 
   const runWorker = async (idx: number) => {
     let completedBytes = 0;
-
-    while (
-      !stopFlag &&
-      performance.now() - testStart <
-        durationMs
-    ) {
-      const upload = xhrUpload(
-        baseUrl,
-        payload,
-        (loaded) => {
-          workerBytes[idx] =
-            completedBytes + loaded;
-        }
-      );
-
-      activeUploads.add(upload.abort);
-
+    while (!globalStop && performance.now() - testStart < durationMs) {
+      const { promise } = xhrUpload(baseUrl, payload, (loaded) => {
+        workerBytes[idx] = completedBytes + loaded;
+      });
       try {
-        await upload.promise;
-
+        await promise;
         completedBytes += chunkSize;
-        workerBytes[idx] =
-          completedBytes;
+        workerBytes[idx] = completedBytes;
       } catch {
-        /*
-         * Abort is expected when the test ends.
-         * Other upload errors should stop the complete test.
-         */
-        if (!opts.signal?.aborted) {
-          stopFlag = true;
-        }
-      } finally {
-        activeUploads.delete(
-          upload.abort
-        );
+        // this worker alone stops; other parallel workers (if any) keep going
+        break;
       }
     }
   };
 
-  const durationTimer = window.setTimeout(
-    () => {
-      stopAllUploads();
-    },
-    durationMs
-  );
+  const durationTimer = window.setTimeout(() => {
+    globalStop = true;
+  }, durationMs);
 
-  try {
-    await Promise.all(
-      Array.from(
-        { length: workerCount },
-        (_, index) =>
-          runWorker(index)
-      )
-    );
-  } finally {
-    window.clearTimeout(
-      durationTimer
-    );
+  await Promise.allSettled(Array.from({ length: workerCount }, (_, i) => runWorker(i)));
+  window.clearTimeout(durationTimer);
+  opts.signal?.removeEventListener("abort", onAbort);
+  sampler.stop();
 
-    stopAllUploads();
-
-    opts.signal?.removeEventListener(
-      "abort",
-      onAbort
-    );
-
-    sampler.stop();
+  const totalBytes = workerBytes.reduce((a: number, b: number) => a + b, 0);
+  if (totalBytes === 0) {
+    throw new Error("Upload test failed — no data could be sent.");
   }
 
-  /*
-   * The test window is intentionally capped at the
-   * requested duration. We do not include cleanup time.
-   */
-  const elapsedMs = Math.min(
-    performance.now() - testStart,
-    durationMs
-  );
-
-  const elapsedSec =
-    elapsedMs / 1000;
-
-  const totalBytes =
-    workerBytes.reduce(
-      (total, bytes) =>
-        total + bytes,
-      0
-    );
-
-  return summarize(
-    sampler.samples,
-    totalBytes,
-    elapsedSec
-  );
+  const elapsedSec = (performance.now() - testStart) / 1000;
+  return summarize(sampler.samples, totalBytes, elapsedSec);
 }
