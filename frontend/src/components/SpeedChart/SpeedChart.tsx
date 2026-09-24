@@ -14,6 +14,14 @@ function buildPath(points: { x: number; y: number }[]): string {
   return points.reduce((path, p, i) => path + `${i === 0 ? "M" : "L"}${p.x.toFixed(2)},${p.y.toFixed(2)} `, "");
 }
 
+function buildAreaPath(points: { x: number; y: number }[], baselineY: number): string {
+  if (points.length === 0) return "";
+  const line = buildPath(points);
+  const last = points[points.length - 1];
+  const first = points[0];
+  return `${line} L${last.x.toFixed(2)},${baselineY} L${first.x.toFixed(2)},${baselineY} Z`;
+}
+
 export function SpeedChart({ samples, height = 220 }: SpeedChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(600);
@@ -28,7 +36,19 @@ export function SpeedChart({ samples, height = 220 }: SpeedChartProps) {
     return () => observer.disconnect();
   }, []);
 
-  const { downloadPath, uploadPath, maxY, avgDownload, avgUpload, peak } = useMemo(() => {
+  const {
+    downloadPath,
+    uploadPath,
+    downloadAreaPath,
+    uploadAreaPath,
+    maxY,
+    avgDownload,
+    avgUpload,
+    avgDownloadY,
+    avgUploadY,
+    peak,
+    baselineY,
+  } = useMemo(() => {
     const downloadPts = samples.filter((s) => s.download !== undefined);
     const uploadPts = samples.filter((s) => s.upload !== undefined);
     const allValues = samples.flatMap((s) => [s.download, s.upload]).filter((v): v is number => v !== undefined);
@@ -37,16 +57,32 @@ export function SpeedChart({ samples, height = 220 }: SpeedChartProps) {
 
     const scaleX = (t: number) => PADDING + (t / maxT) * (width - PADDING * 2);
     const scaleY = (v: number) => height - PADDING - (v / maxY) * (height - PADDING * 2);
+    const baselineY = height - PADDING;
 
     const downloadPath = buildPath(downloadPts.map((p) => ({ x: scaleX(p.t), y: scaleY(p.download!) })));
     const uploadPath = buildPath(uploadPts.map((p) => ({ x: scaleX(p.t), y: scaleY(p.upload!) })));
+
+    const downloadAreaPath = buildAreaPath(downloadPts.map((p) => ({ x: scaleX(p.t), y: scaleY(p.download!) })), baselineY);
+    const uploadAreaPath = buildAreaPath(uploadPts.map((p) => ({ x: scaleX(p.t), y: scaleY(p.upload!) })), baselineY);
 
     const avg = (arr: number[]) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0);
     const avgDownload = avg(downloadPts.map((p) => p.download!));
     const avgUpload = avg(uploadPts.map((p) => p.upload!));
     const peak = allValues.length ? Math.max(...allValues) : 0;
 
-    return { downloadPath, uploadPath, maxY, avgDownload, avgUpload, peak };
+    return {
+      downloadPath,
+      uploadPath,
+      downloadAreaPath,
+      uploadAreaPath,
+      maxY,
+      avgDownload,
+      avgUpload,
+      avgDownloadY: scaleY(avgDownload),
+      avgUploadY: scaleY(avgUpload),
+      peak,
+      baselineY,
+    };
   }, [samples, width, height]);
 
   const gridLines = [0.25, 0.5, 0.75, 1];
@@ -62,6 +98,17 @@ export function SpeedChart({ samples, height = 220 }: SpeedChartProps) {
   return (
     <div ref={containerRef} className="w-full">
       <svg viewBox={`0 0 ${width} ${height}`} width="100%" height={height} preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="chart-download-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--vln-accent)" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="var(--vln-accent)" stopOpacity="0" />
+          </linearGradient>
+          <linearGradient id="chart-upload-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--vln-accent-2)" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="var(--vln-accent-2)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+
         {gridLines.map((g) => (
           <line
             key={g}
@@ -74,6 +121,79 @@ export function SpeedChart({ samples, height = 220 }: SpeedChartProps) {
           />
         ))}
 
+        {/* soft area fills under each curve */}
+        <motion.path
+          d={downloadAreaPath}
+          fill="url(#chart-download-fill)"
+          stroke="none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        />
+        <motion.path
+          d={uploadAreaPath}
+          fill="url(#chart-upload-fill)"
+          stroke="none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        />
+
+        {/* mean / average dashed reference lines */}
+        <motion.line
+          x1={PADDING}
+          x2={width - PADDING}
+          y1={avgDownloadY}
+          y2={avgDownloadY}
+          stroke="var(--vln-accent)"
+          strokeWidth={1.25}
+          strokeDasharray="5 4"
+          opacity={0.55}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.55 }}
+          transition={{ duration: 0.6, delay: 1.1 }}
+        />
+        <motion.line
+          x1={PADDING}
+          x2={width - PADDING}
+          y1={avgUploadY}
+          y2={avgUploadY}
+          stroke="var(--vln-accent-2)"
+          strokeWidth={1.25}
+          strokeDasharray="5 4"
+          opacity={0.5}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+        />
+        <motion.text
+          x={width - PADDING - 4}
+          y={avgDownloadY - 6}
+          textAnchor="end"
+          fontSize={9.5}
+          fill="var(--vln-accent)"
+          className="font-mono tabular"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.9 }}
+          transition={{ duration: 0.5, delay: 1.3 }}
+        >
+          avg {avgDownload.toFixed(1)}
+        </motion.text>
+        <motion.text
+          x={width - PADDING - 4}
+          y={avgUploadY - 6}
+          textAnchor="end"
+          fontSize={9.5}
+          fill="var(--vln-accent-2)"
+          className="font-mono tabular"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.9 }}
+          transition={{ duration: 0.5, delay: 1.4 }}
+        >
+          avg {avgUpload.toFixed(1)}
+        </motion.text>
+
+        {/* the live curves */}
         <motion.path
           d={downloadPath}
           fill="none"

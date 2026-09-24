@@ -164,3 +164,28 @@ body {
     scroll-behavior: auto !important;
   }
 }
+/* ---- Glowing premium contact text ------------------------------------ */
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    text-shadow: 0 0 8px var(--vln-accent-glow), 0 0 2px var(--vln-accent-glow);
+    opacity: 0.85;
+  }
+  50% {
+    text-shadow: 0 0 16px var(--vln-accent-glow), 0 0 4px var(--vln-accent-glow);
+    opacity: 1;
+  }
+}
+
+.glow-text {
+  color: var(--vln-accent);
+  animation: glowPulse 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow-text {
+    animation: none;
+    text-shadow: 0 0 10px var(--vln-accent-glow);
+  }
+}
