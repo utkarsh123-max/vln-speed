@@ -128,8 +128,9 @@ export function useSpeedTest(server: ServerInfo) {
       setResult(finalResult);
       setPhase("complete");
       return finalResult;
-    } catch (err) {
+        } catch (err) {
       stopSmoothing();
+      console.error("Speed test failed:", err);
       if (controller.signal.aborted) {
         setPhase("idle");
         return null;
