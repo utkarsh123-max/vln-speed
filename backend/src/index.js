@@ -30,7 +30,7 @@ app.use(
 );
 
 app.disable("x-powered-by");
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
 app.use("/api", healthRoute);
 app.use("/api", serverRoute);
