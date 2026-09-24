@@ -62,9 +62,17 @@ export function Footer() {
             <span className="glow-text font-semibold">Contact for sites, tools, landing pages &amp; ad promotions</span>
             <span className="mx-1.5 text-border">·</span>
             <span className="inline-flex items-center gap-1 text-secondary">
-              <Send size={11} className="text-accent" />
-              Telegram <span className="text-primary font-medium">@vlnrise</span>
-            </span>
+  <Send size={11} className="text-accent" />
+  Telegram{" "}
+  <a
+    href="https://t.me/vlnrise"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-primary font-medium hover:text-accent transition-colors"
+  >
+    @vlnrise
+  </a>
+</span>
           </motion.p>
         </div>
       </div>
