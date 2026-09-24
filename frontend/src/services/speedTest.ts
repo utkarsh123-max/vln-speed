@@ -178,7 +178,7 @@ export async function runDownloadTest(
   } = {}
 ): Promise<ThroughputSummary> {
   const durationMs = opts.durationMs ?? 8000;
-  const streamCount = Math.max(1, opts.parallelStreams ?? 4);
+  const streamCount = Math.max(1, opts.parallelStreams ?? 2);
 
   let totalBytes = 0;
 
@@ -436,12 +436,12 @@ export async function runUploadTest(
 
   const workerCount = Math.max(
     1,
-    opts.parallelStreams ?? 3
+    opts.parallelStreams ?? 2
   );
 
   const chunkSize =
     opts.chunkSizeBytes ??
-    8 * 1024 * 1024;
+    4 * 1024 * 1024;
 
   const payload =
     createRandomPayload(chunkSize);

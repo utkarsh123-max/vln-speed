@@ -1,21 +1,24 @@
 import { Router } from "express";
 import crypto from "node:crypto";
+import { Readable } from "node:stream";
 import { noCache } from "../middleware/noCache.js";
 
 const router = Router();
 
-const CHUNK_SIZE = 64 * 1024; // 64KB per write
+const CHUNK_SIZE = 64 * 1024; // 64KB per push
 const MAX_DURATION_MS = 15_000;
 const MAX_BYTES = 200 * 1024 * 1024; // hard safety cap: 200MB per request
 
 const CHUNK = crypto.randomBytes(CHUNK_SIZE);
 
 /**
- * No request-count rate limiter here on purpose: a fast connection (or
- * localhost loopback) legitimately opens many chunked reads in a single
- * test, and counting that as "abuse" breaks real tests. Safety instead
- * comes from the duration cap and byte cap below, which bound any single
- * request regardless of how many run concurrently.
+ * Streams data using a proper Node Readable stream + .pipe(), instead of a
+ * manual res.write()/setImmediate() recursion. The manual version could
+ * monopolize the event loop under load, which on a low-CPU free-tier
+ * instance starved the platform's own health checks and caused Render to
+ * kill the connection mid-transfer (~4-5s in). Readable + pipe() lets
+ * Node's stream internals pace pushes and cooperate with the event loop
+ * instead of hammering it in a tight loop.
  */
 router.get("/download", noCache, (req, res) => {
   const requestedDuration = Number(req.query.duration) || 8000;
@@ -29,30 +32,28 @@ router.get("/download", noCache, (req, res) => {
 
   const start = Date.now();
   let bytesSent = 0;
-  let closed = false;
 
-  req.on("close", () => {
-    closed = true;
+  const stream = new Readable({
+    highWaterMark: CHUNK_SIZE * 4,
+    read() {
+      if (Date.now() - start >= duration || bytesSent >= MAX_BYTES) {
+        this.push(null);
+        return;
+      }
+      bytesSent += CHUNK_SIZE;
+      this.push(CHUNK);
+    },
   });
 
-  function pump() {
-    if (closed) return;
-    if (Date.now() - start >= duration || bytesSent >= MAX_BYTES) {
-      res.end();
-      return;
-    }
+  req.on("close", () => {
+    stream.destroy();
+  });
 
-    const canContinue = res.write(CHUNK);
-    bytesSent += CHUNK_SIZE;
+  stream.on("error", () => {
+    if (!res.writableEnded) res.end();
+  });
 
-    if (canContinue) {
-      setImmediate(pump);
-    } else {
-      res.once("drain", pump);
-    }
-  }
-
-  pump();
+  stream.pipe(res);
 });
 
 export default router;
