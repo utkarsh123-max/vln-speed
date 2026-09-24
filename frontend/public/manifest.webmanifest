@@ -1,0 +1,12 @@
+{
+  "name": "VLN Speed",
+  "short_name": "VLN Speed",
+  "description": "Measure Your Connection. Know Your Network.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#07090D",
+  "theme_color": "#07090D",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

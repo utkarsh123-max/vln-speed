@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark theme (default) — "premium instrument panel" */
+  --vln-bg: #07090d;
+  --vln-surface: #0d1117;
+  --vln-elevated: #121821;
+  --vln-border: rgba(255, 255, 255, 0.08);
+  --vln-text-primary: #f5f7fa;
+  --vln-text-secondary: #8c96a5;
+  --vln-text-muted: #56606f;
+  --vln-accent: #4cc9f0;
+  --vln-accent-2: #4361ee;
+  --vln-accent-glow: rgba(76, 201, 240, 0.35);
+  --vln-success: #3ddc97;
+  --vln-warning: #ffb84d;
+  --vln-danger: #ff5c6c;
+
+  /* Layered mesh behind the whole page — this is what gives depth instead
+     of a flat single color. Multiple soft blobs at different positions. */
+  --vln-mesh: radial-gradient(ellipse 65% 45% at 50% -8%, rgba(76, 201, 240, 0.22), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 100% 15%, rgba(67, 97, 238, 0.14), transparent 65%),
+    radial-gradient(ellipse 60% 45% at -5% 60%, rgba(76, 201, 240, 0.08), transparent 65%),
+    radial-gradient(ellipse 70% 50% at 50% 115%, rgba(67, 97, 238, 0.10), transparent 70%);
+}
+
+:root.light {
+  /* Light theme — not an inversion. Warm-neutral surfaces, ink-blue accent
+     for contrast on white, restrained shadows instead of glow. */
+  --vln-bg: #eef1f5;
+  --vln-surface: #ffffff;
+  --vln-elevated: #ffffff;
+  --vln-border: rgba(15, 23, 33, 0.11);
+  --vln-text-primary: #10141a;
+  --vln-text-secondary: #4b5563;
+  --vln-text-muted: #8a93a1;
+  --vln-accent: #0284c7;
+  --vln-accent-2: #3730a3;
+  --vln-accent-glow: rgba(2, 132, 199, 0.18);
+  --vln-success: #0f9d6e;
+  --vln-warning: #b56a00;
+  --vln-danger: #d6293e;
+
+  /* Light theme needs *more* visible color here than dark does, since a
+     pale gray blob on near-white reads as almost nothing otherwise. */
+  --vln-mesh: radial-gradient(ellipse 60% 42% at 12% -6%, rgba(2, 132, 199, 0.16), transparent 62%),
+    radial-gradient(ellipse 55% 42% at 105% 12%, rgba(55, 48, 163, 0.11), transparent 65%),
+    radial-gradient(ellipse 55% 45% at -5% 65%, rgba(2, 132, 199, 0.08), transparent 65%),
+    radial-gradient(ellipse 65% 50% at 50% 118%, rgba(55, 48, 163, 0.07), transparent 70%);
+}
+
+* {
+  border-color: var(--vln-border);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--vln-bg);
+  background-image: var(--vln-mesh);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: var(--vln-text-primary);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+/* ---- Premium surface utilities ------------------------------------- */
+
+.glass {
+  background: color-mix(in srgb, var(--vln-surface) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+.card-premium {
+  background: linear-gradient(160deg, var(--vln-elevated) 0%, var(--vln-surface) 100%);
+  border: 1px solid var(--vln-border);
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+    0 24px 48px -28px rgba(0, 0, 0, 0.6);
+}
+
+:root.light .card-premium {
+  /* black shadow alone reads too faint on white; pair it with a slightly
+     stronger, tighter shadow so cards visibly lift off the page */
+  box-shadow:
+    0 1px 0 0 rgba(255, 255, 255, 0.6) inset,
+    0 2px 8px -2px rgba(15, 23, 33, 0.06),
+    0 24px 48px -28px rgba(15, 23, 33, 0.18);
+}
+
+.text-gradient {
+  background: linear-gradient(120deg, var(--vln-text-primary) 30%, var(--vln-accent) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    100deg,
+    var(--vln-text-secondary) 30%,
+    var(--vln-accent) 45%,
+    var(--vln-text-secondary) 60%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.ring-hairline {
+  box-shadow: 0 0 0 1px var(--vln-border);
+}
+
+::selection {
+  background: var(--vln-accent);
+  color: #07090d;
+}
+
+/* Slim, unobtrusive scrollbar that matches the instrument-panel feel */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--vln-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vln-text-muted);
+}
+
+:focus-visible {
+  outline: 2px solid var(--vln-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
