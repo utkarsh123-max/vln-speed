@@ -10,8 +10,9 @@ interface NavbarProps {
 
 const LINKS = [
   { to: "/", label: "Test" },
+  { to: "/internet-speed-guide", label: "Guide" },
+  { to: "/faq", label: "FAQ" },
   { to: "/history", label: "History" },
-  { to: "/servers", label: "Servers" },
   { to: "/about", label: "About" },
 ];
 
