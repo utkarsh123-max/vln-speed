@@ -8,24 +8,38 @@ const SOCIALS = [
   { icon: Twitter, label: "X", handle: "@vlnrise", href: "https://x.com/vlnrise" },
 ];
 
+const PRODUCT_LINKS = [
+  { to: "/", label: "Speed Test" },
+  { to: "/history", label: "History" },
+  { to: "/servers", label: "Servers" },
+];
+
+const LEARN_LINKS = [
+  { to: "/internet-speed-guide", label: "Speed Guide" },
+  { to: "/faq", label: "FAQ" },
+  { to: "/about", label: "About" },
+];
+
+const LEGAL_LINKS = [
+  { to: "/privacy", label: "Privacy Policy" },
+  { to: "/terms", label: "Terms" },
+  { to: "/contact", label: "Contact" },
+];
+
 export function Footer() {
   return (
     <footer className="border-t border-border mt-24">
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-        <div>
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8">
+        <div className="col-span-2 sm:col-span-1">
           <span className="text-sm font-bold text-primary">
             VLN <span className="text-accent">SPEED</span>
           </span>
-          <p className="text-xs text-muted mt-1">Measure Your Connection. Know Your Network.</p>
+          <p className="text-xs text-muted mt-2 leading-relaxed">Measure Your Connection. Know Your Network.</p>
         </div>
-        <nav className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-secondary">
-          <Link to="/" className="hover:text-primary transition-colors">Test</Link>
-          <Link to="/history" className="hover:text-primary transition-colors">History</Link>
-          <Link to="/servers" className="hover:text-primary transition-colors">Servers</Link>
-          <Link to="/privacy" className="hover:text-primary transition-colors">Privacy</Link>
-          <Link to="/about" className="hover:text-primary transition-colors">About</Link>
-        </nav>
-        <span className="text-xs text-muted">© {new Date().getFullYear()} VLN</span>
+
+        <FooterColumn title="Product" links={PRODUCT_LINKS} />
+        <FooterColumn title="Learn" links={LEARN_LINKS} />
+        <FooterColumn title="Legal" links={LEGAL_LINKS} />
       </div>
 
       {/* Social + contact strip */}
@@ -62,20 +76,31 @@ export function Footer() {
             <span className="glow-text font-semibold">Contact for sites, tools, landing pages &amp; ad promotions</span>
             <span className="mx-1.5 text-border">·</span>
             <span className="inline-flex items-center gap-1 text-secondary">
-  <Send size={11} className="text-accent" />
-  Telegram{" "}
-  <a
-    href="https://t.me/vlnrise"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="text-primary font-medium hover:text-accent transition-colors"
-  >
-    @vlnrise
-  </a>
-</span>
+              <Send size={11} className="text-accent" />
+              Telegram <span className="text-primary font-medium">@vlnrise</span>
+            </span>
           </motion.p>
+
+          <span className="text-[11px] text-muted">© {new Date().getFullYear()} VLN Speed</span>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({ title, links }: { title: string; links: { to: string; label: string }[] }) {
+  return (
+    <div>
+      <h3 className="text-[11px] tracking-[0.14em] uppercase text-muted font-semibold mb-3">{title}</h3>
+      <ul className="flex flex-col gap-2">
+        {links.map((l) => (
+          <li key={l.to}>
+            <Link to={l.to} className="text-xs text-secondary hover:text-primary transition-colors">
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

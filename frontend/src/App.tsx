@@ -10,6 +10,7 @@ import { Faq } from "./pages/Faq";
 import { Terms } from "./pages/Terms";
 import { Privacy } from "./pages/Privacy";
 import { useTheme } from "./hooks/useTheme";
+import { InternetSpeedGuide } from "./pages/InternetSpeedGuide";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/faq" element={<Faq />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/internet-speed-guide" element={<InternetSpeedGuide />} />
           </Routes>
         </main>
         <Footer />
