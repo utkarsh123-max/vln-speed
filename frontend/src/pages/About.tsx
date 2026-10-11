@@ -1,6 +1,6 @@
-
 import { motion } from "framer-motion";
-import { Radio, ArrowLeftRight, ShieldCheck, Sparkles, Check } from "lucide-react";
+import { Radio, ArrowLeftRight, ShieldCheck, Sparkles, Check, Target } from "lucide-react";
+import { Seo } from "../components/Seo/Seo";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -32,6 +32,12 @@ const PRINCIPLES = [
 export function About() {
   return (
     <div className="relative">
+      <Seo
+        title="About VLN Speed"
+        description="VLN Speed is a free internet speed test that measures real download, upload, ping and jitter — no fake numbers, no hidden formulas. Learn how it works."
+        canonicalPath="/about"
+      />
+
       <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
         <motion.div
           initial={{ opacity: 0, y: 14 }}
@@ -45,18 +51,37 @@ export function About() {
           </span>
           <h1 className="mt-5 text-3xl sm:text-4xl font-extrabold tracking-tight text-gradient">About VLN Speed</h1>
           <p className="mt-4 text-sm sm:text-base text-secondary leading-relaxed max-w-xl mx-auto">
-            VLN Speed measures your connection the direct way: real ping requests, real bytes streamed down, real
-            bytes uploaded back — timed as they happen. Nothing on the result screen is simulated.
+            VLN Speed is a free tool for measuring your internet connection's real performance — download, upload,
+            ping and jitter — using actual data transferred over the network, not simulated numbers.
           </p>
         </motion.div>
 
-        <div className="grid sm:grid-cols-3 gap-4 mt-12">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.08, ease: easeOut }}
+          className="card-premium rounded-2xl p-6 sm:p-7 mt-10 flex flex-col gap-3"
+        >
+          <span className="w-9 h-9 rounded-xl bg-accent/10 flex items-center justify-center text-accent">
+            <Target size={17} />
+          </span>
+          <h2 className="text-base font-semibold text-primary">Why we built this</h2>
+          <p className="text-sm text-secondary leading-relaxed">
+            Most people only find out their internet is underperforming when a video call drops or a download
+            crawls. ISPs advertise a headline speed, but what you actually get depends on your Wi-Fi, your router,
+            how many devices are active, and the distance to the server you're testing against. VLN Speed exists so
+            you can check the real number in a few seconds, understand what it means for what you're trying to do,
+            and have evidence if you ever need to raise it with your provider.
+          </p>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-3 gap-4 mt-6">
           {STEPS.map((step, i) => (
             <motion.div
               key={step.title}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 + i * 0.08, ease: easeOut }}
+              transition={{ duration: 0.5, delay: 0.14 + i * 0.08, ease: easeOut }}
               whileHover={{ y: -3 }}
               className="card-premium rounded-2xl p-5 flex flex-col gap-3"
             >
@@ -93,6 +118,17 @@ export function About() {
             ))}
           </ul>
         </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+          className="text-xs text-muted text-center mt-8 leading-relaxed max-w-md mx-auto"
+        >
+          We don't claim to be the "most accurate" or "most trusted" speed test — those are claims we can't back
+          with evidence. What we can promise is that every number you see came from a real transfer, measured the
+          same transparent way every time.
+        </motion.p>
       </div>
     </div>
   );
