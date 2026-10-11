@@ -9,7 +9,7 @@ const CHANNELS = [
     icon: Mail,
     label: "Email",
     value: "vlngaming7380@gmail.com",
-    href: "mailto:vlngaming7380@gmail.com",
+    href: "mailto:vlnriseofficial@gmail.com",
     note: "Best for bug reports, feedback, or questions about a result.",
   },
   {
