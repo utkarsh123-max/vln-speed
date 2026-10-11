@@ -5,6 +5,9 @@ import { Home } from "./pages/Home";
 import { History } from "./pages/History";
 import { Servers } from "./pages/Servers";
 import { About } from "./pages/About";
+import { Contact } from "./pages/Contact";
+import { Faq } from "./pages/Faq";
+import { Terms } from "./pages/Terms";
 import { Privacy } from "./pages/Privacy";
 import { useTheme } from "./hooks/useTheme";
 
@@ -21,6 +24,9 @@ export default function App() {
             <Route path="/history" element={<History />} />
             <Route path="/servers" element={<Servers />} />
             <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/faq" element={<Faq />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
           </Routes>
         </main>
