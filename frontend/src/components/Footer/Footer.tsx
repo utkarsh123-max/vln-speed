@@ -79,19 +79,32 @@ export function Footer() {
           </div>
 
           <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-[11px] sm:text-xs text-center text-muted tracking-wide"
-          >
-            <span className="glow-text font-semibold">Contact for sites, tools, landing pages &amp; ad promotions</span>
-            <span className="mx-1.5 text-border">·</span>
-            <span className="inline-flex items-center gap-1 text-secondary">
-              <Send size={11} className="text-accent" />
-              Telegram <span className="text-primary font-medium">@vlnrise</span>
-            </span>
-          </motion.p>
+  initial={{ opacity: 0 }}
+  whileInView={{ opacity: 1 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.5, delay: 0.2 }}
+  className="text-[11px] sm:text-xs text-center text-muted tracking-wide"
+>
+  <span className="glow-text font-semibold">
+    Contact for sites, tools, landing pages &amp; ad promotions
+  </span>
+
+  <span className="mx-1.5 text-border">·</span>
+
+  <span className="inline-flex items-center gap-1 text-secondary">
+    <Send size={11} className="text-accent" />
+
+    Telegram{" "}
+    <a
+      href="https://t.me/vlnrise"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-primary font-medium hover:text-accent transition-colors cursor-pointer"
+    >
+      @vlnrise
+    </a>
+  </span>
+</motion.p>
 
           <span className="text-[11px] text-muted">© {new Date().getFullYear()} VLN Speed</span>
         </div>
