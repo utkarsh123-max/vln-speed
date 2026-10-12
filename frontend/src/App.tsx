@@ -19,6 +19,12 @@ import { VideoCallSpeed } from "./pages/VideoCallSpeed";
 import { Troubleshooting } from "./pages/Troubleshooting";
 import { useTheme } from "./hooks/useTheme";
 import { HowSpeedTestWorks } from "./pages/HowSpeedTestWorks";
+import { useScrollToTop } from "./hooks/useScrollToTop";
+
+function ScrollToTop() {
+  useScrollToTop();
+  return null;
+}
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
@@ -26,6 +32,7 @@ export default function App() {
   return (
     <HashRouter>
       <div className="min-h-screen flex flex-col bg-bg text-primary">
+        <ScrollToTop />
         <Navbar theme={theme} onToggleTheme={toggleTheme} />
         <main className="flex-1">
           <Routes>
