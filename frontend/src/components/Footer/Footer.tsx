@@ -23,6 +23,7 @@ const USE_CASE_LINKS = [
 
 const LEARN_LINKS = [
   { to: "/internet-speed-guide", label: "Speed Guide" },
+  { to: "/how-speed-test-works", label: "How It Works" },
   { to: "/download-speed", label: "Download Speed" },
   { to: "/upload-speed", label: "Upload Speed" },
   { to: "/ping-latency", label: "Ping & Latency" },

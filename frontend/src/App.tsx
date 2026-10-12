@@ -18,6 +18,7 @@ import { StreamingSpeed } from "./pages/StreamingSpeed";
 import { VideoCallSpeed } from "./pages/VideoCallSpeed";
 import { Troubleshooting } from "./pages/Troubleshooting";
 import { useTheme } from "./hooks/useTheme";
+import { HowSpeedTestWorks } from "./pages/HowSpeedTestWorks";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/streaming-internet-speed" element={<StreamingSpeed />} />
             <Route path="/video-call-speed" element={<VideoCallSpeed />} />
             <Route path="/troubleshooting" element={<Troubleshooting />} />
+            <Route path="/how-speed-test-works" element={<HowSpeedTestWorks />} />
           </Routes>
         </main>
         <Footer />
