@@ -9,8 +9,8 @@ import { Contact } from "./pages/Contact";
 import { Faq } from "./pages/Faq";
 import { Terms } from "./pages/Terms";
 import { Privacy } from "./pages/Privacy";
-import { useTheme } from "./hooks/useTheme";
 import { InternetSpeedGuide } from "./pages/InternetSpeedGuide";
+import { useTheme } from "./hooks/useTheme";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
