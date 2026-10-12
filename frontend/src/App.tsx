@@ -10,6 +10,13 @@ import { Faq } from "./pages/Faq";
 import { Terms } from "./pages/Terms";
 import { Privacy } from "./pages/Privacy";
 import { InternetSpeedGuide } from "./pages/InternetSpeedGuide";
+import { DownloadSpeed } from "./pages/DownloadSpeed";
+import { UploadSpeed } from "./pages/UploadSpeed";
+import { PingLatency } from "./pages/PingLatency";
+import { GamingSpeed } from "./pages/GamingSpeed";
+import { StreamingSpeed } from "./pages/StreamingSpeed";
+import { VideoCallSpeed } from "./pages/VideoCallSpeed";
+import { Troubleshooting } from "./pages/Troubleshooting";
 import { useTheme } from "./hooks/useTheme";
 
 export default function App() {
@@ -30,6 +37,13 @@ export default function App() {
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/internet-speed-guide" element={<InternetSpeedGuide />} />
+            <Route path="/download-speed" element={<DownloadSpeed />} />
+            <Route path="/upload-speed" element={<UploadSpeed />} />
+            <Route path="/ping-latency" element={<PingLatency />} />
+            <Route path="/gaming-internet-speed" element={<GamingSpeed />} />
+            <Route path="/streaming-internet-speed" element={<StreamingSpeed />} />
+            <Route path="/video-call-speed" element={<VideoCallSpeed />} />
+            <Route path="/troubleshooting" element={<Troubleshooting />} />
           </Routes>
         </main>
         <Footer />

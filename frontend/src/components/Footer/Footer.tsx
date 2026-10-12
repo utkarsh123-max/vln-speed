@@ -14,8 +14,18 @@ const PRODUCT_LINKS = [
   { to: "/servers", label: "Servers" },
 ];
 
+const USE_CASE_LINKS = [
+  { to: "/gaming-internet-speed", label: "Gaming" },
+  { to: "/streaming-internet-speed", label: "Streaming" },
+  { to: "/video-call-speed", label: "Video Calls" },
+  { to: "/troubleshooting", label: "Troubleshooting" },
+];
+
 const LEARN_LINKS = [
   { to: "/internet-speed-guide", label: "Speed Guide" },
+  { to: "/download-speed", label: "Download Speed" },
+  { to: "/upload-speed", label: "Upload Speed" },
+  { to: "/ping-latency", label: "Ping & Latency" },
   { to: "/faq", label: "FAQ" },
   { to: "/about", label: "About" },
 ];
@@ -29,7 +39,7 @@ const LEGAL_LINKS = [
 export function Footer() {
   return (
     <footer className="border-t border-border mt-24">
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-12 grid grid-cols-2 sm:grid-cols-5 gap-8">
         <div className="col-span-2 sm:col-span-1">
           <span className="text-sm font-bold text-primary">
             VLN <span className="text-accent">SPEED</span>
@@ -38,6 +48,7 @@ export function Footer() {
         </div>
 
         <FooterColumn title="Product" links={PRODUCT_LINKS} />
+        <FooterColumn title="Use Cases" links={USE_CASE_LINKS} />
         <FooterColumn title="Learn" links={LEARN_LINKS} />
         <FooterColumn title="Legal" links={LEGAL_LINKS} />
       </div>
