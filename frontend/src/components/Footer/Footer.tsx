@@ -106,7 +106,15 @@ export function Footer() {
   </span>
 </motion.p>
 
-          <span className="text-[11px] text-muted">© {new Date().getFullYear()} VLN Speed</span>
+                    <div className="flex flex-col items-center gap-1.5">
+            <span className="text-[11px] text-muted">
+              © {new Date().getFullYear()} VLN Speed · All rights reserved.
+            </span>
+            <span className="text-[10px] text-muted/70 max-w-md text-center leading-relaxed">
+              VLN Speed is an independent internet speed testing tool and is not affiliated with Ookla®,
+              Speedtest®, or any internet service provider.
+            </span>
+          </div>
         </div>
       </div>
     </footer>
