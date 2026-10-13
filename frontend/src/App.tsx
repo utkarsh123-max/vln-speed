@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/Navbar/Navbar";
 import { Footer } from "./components/Footer/Footer";
 import { Home } from "./pages/Home";
@@ -30,7 +30,7 @@ export default function App() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <div className="min-h-screen flex flex-col bg-bg text-primary">
         <ScrollToTop />
         <Navbar theme={theme} onToggleTheme={toggleTheme} />
@@ -57,6 +57,6 @@ export default function App() {
         </main>
         <Footer />
       </div>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
