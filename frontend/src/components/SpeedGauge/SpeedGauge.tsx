@@ -157,15 +157,15 @@ export function SpeedGauge({
     <div className="relative select-none flex items-center justify-center" style={{ width: size, height: size }}>
       {/* decorative outer instrument rings — pure HUD ornament, counter-rotating */}
       <div
-        className={`absolute rounded-full border border-dashed border-border/70 ${reducedMotion ? "" : "animate-spinSlow"}`}
-        style={{ width: size * 1.14, height: size * 1.14 }}
-        aria-hidden="true"
-      />
-      <div
-        className={`absolute rounded-full border border-border/40 ${reducedMotion ? "" : "animate-spinSlowReverse"}`}
-        style={{ width: size * 1.24, height: size * 1.24 }}
-        aria-hidden="true"
-      />
+  className={`absolute rounded-full border border-dashed border-border/40 ${reducedMotion ? "" : "animate-spinSlow"}`}
+  style={{ width: size * 1.14, height: size * 1.14 }}
+  aria-hidden="true"
+/>
+<div
+  className={`absolute rounded-full border border-border/20 ${reducedMotion ? "" : "animate-spinSlowReverse"}`}
+  style={{ width: size * 1.24, height: size * 1.24 }}
+  aria-hidden="true"
+/>
       {/* soft ambient halo that blooms while a measurement is active */}
       <div
         className="absolute rounded-full transition-opacity duration-700"
