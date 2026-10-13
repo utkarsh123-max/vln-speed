@@ -24,7 +24,7 @@ const CHANNELS = [
 
 export function Contact() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="Contact VLN Speed"
         description="Get in touch with VLN Speed for feedback, bug reports, or questions about your speed test results."

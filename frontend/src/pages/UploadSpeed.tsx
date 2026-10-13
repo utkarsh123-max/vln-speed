@@ -15,7 +15,7 @@ const USE_CASES = [
 
 export function UploadSpeed() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="What Is Upload Speed?"
         description="Upload speed explained: what it measures, how many Mbps you need for video calls, cloud backup, and livestreaming, and why it matters as much as download speed."

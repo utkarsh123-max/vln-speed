@@ -15,7 +15,7 @@ const QUALITY_TIERS = [
 
 export function StreamingSpeed() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="Best Internet Speed for Streaming"
         description="How much internet speed you need for Netflix, YouTube, and other streaming services at SD, HD, and 4K quality — plus why streaming buffers even on fast connections."

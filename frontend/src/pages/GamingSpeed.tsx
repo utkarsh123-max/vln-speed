@@ -22,7 +22,7 @@ const TIPS = [
 
 export function GamingSpeed() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="Best Internet Speed for Gaming"
         description="What internet speed, ping, and jitter you actually need for online gaming — and why low latency matters more than high download speed."

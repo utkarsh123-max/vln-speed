@@ -54,7 +54,7 @@ const WIFI_NOTES = [
 
 export function InternetSpeedGuide() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="Internet Speed Guide"
         description="A clear guide to Mbps, MB/s, download vs upload, ping, jitter, packet loss, and Wi-Fi standards — what they mean and why your speed test results look the way they do."

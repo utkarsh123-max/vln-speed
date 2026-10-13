@@ -16,7 +16,7 @@ const RANGES = [
 
 export function PingLatency() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="What Is Ping / Latency?"
         description="Ping and latency explained: what good ping looks like for gaming and calls, why it's different from download speed, and what causes high ping."

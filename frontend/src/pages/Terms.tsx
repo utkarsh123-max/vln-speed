@@ -34,7 +34,7 @@ const SECTIONS = [
 
 export function Terms() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="Terms and Conditions"
         description="Terms and conditions for using VLN Speed's internet speed testing tool, including acceptable use, accuracy limitations, and service availability."

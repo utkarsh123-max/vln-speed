@@ -31,7 +31,7 @@ const STEPS = [
 
 export function HowSpeedTestWorks() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="How Internet Speed Tests Work"
         description="A step-by-step look at how VLN Speed measures your connection — from the ping phase to real data streaming and how your final result is calculated."

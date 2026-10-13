@@ -95,7 +95,7 @@ export function Faq() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="Frequently Asked Questions"
         description="Answers to common questions about internet speed tests: accuracy, Mbps vs MB/s, ping, Wi-Fi vs Ethernet, VPNs, and why your speed changes."

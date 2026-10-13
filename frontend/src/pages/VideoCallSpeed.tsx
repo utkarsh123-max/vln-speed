@@ -15,7 +15,7 @@ const PLATFORM_NEEDS = [
 
 export function VideoCallSpeed() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="Best Internet Speed for Video Calls"
         description="How much download and upload speed you need for smooth Zoom, Google Meet, and Teams calls — including group calls and screen sharing."

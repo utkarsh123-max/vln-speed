@@ -18,7 +18,7 @@ export function BackButton() {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
       whileHover={{ x: -2 }}
-      className="inline-flex items-center gap-1.5 text-xs font-medium text-secondary hover:text-primary transition-colors mb-6"
+      className="inline-flex items-center gap-1.5 text-xs font-medium text-secondary hover:text-primary transition-colors mb-2"
     >
       <ArrowLeft size={14} />
       Back

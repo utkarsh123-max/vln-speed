@@ -43,7 +43,7 @@ const STEPS = [
 
 export function Troubleshooting() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="Internet Speed Troubleshooting Guide"
         description="Step-by-step checklist to fix slow internet speed — from restarting your router to testing on Ethernet and checking for network congestion."

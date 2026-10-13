@@ -15,7 +15,7 @@ const USE_CASES = [
 
 export function DownloadSpeed() {
   return (
-    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
+    <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-4 sm:pt-6 pb-16">
       <Seo
         title="What Is Download Speed?"
         description="Download speed explained: what it measures, how many Mbps you actually need for streaming, gaming, and video calls, and why it's usually higher than upload speed."
