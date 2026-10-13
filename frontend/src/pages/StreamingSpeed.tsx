@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Tv, ArrowRight } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -20,6 +21,8 @@ export function StreamingSpeed() {
         description="How much internet speed you need for Netflix, YouTube, and other streaming services at SD, HD, and 4K quality — plus why streaming buffers even on fast connections."
         canonicalPath="/streaming-internet-speed"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

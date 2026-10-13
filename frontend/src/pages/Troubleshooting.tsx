@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Wrench, ArrowRight, CheckCircle2 } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -48,6 +49,8 @@ export function Troubleshooting() {
         description="Step-by-step checklist to fix slow internet speed — from restarting your router to testing on Ethernet and checking for network congestion."
         canonicalPath="/troubleshooting"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

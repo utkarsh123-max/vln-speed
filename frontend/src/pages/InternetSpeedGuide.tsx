@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { BookOpen, Gauge, ArrowRight } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -59,6 +60,8 @@ export function InternetSpeedGuide() {
         description="A clear guide to Mbps, MB/s, download vs upload, ping, jitter, packet loss, and Wi-Fi standards — what they mean and why your speed test results look the way they do."
         canonicalPath="/internet-speed-guide"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

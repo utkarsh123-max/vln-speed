@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Gamepad2, ArrowRight } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -27,6 +28,8 @@ export function GamingSpeed() {
         description="What internet speed, ping, and jitter you actually need for online gaming — and why low latency matters more than high download speed."
         canonicalPath="/gaming-internet-speed"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

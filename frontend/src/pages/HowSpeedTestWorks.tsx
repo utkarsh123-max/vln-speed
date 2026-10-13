@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Workflow, ArrowRight, Radio, ArrowDownToLine, ArrowUpFromLine, BarChart3 } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -36,6 +37,8 @@ export function HowSpeedTestWorks() {
         description="A step-by-step look at how VLN Speed measures your connection — from the ping phase to real data streaming and how your final result is calculated."
         canonicalPath="/how-speed-test-works"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

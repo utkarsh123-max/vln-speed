@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Mail, Send, MessageCircle } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -29,6 +30,8 @@ export function Contact() {
         description="Get in touch with VLN Speed for feedback, bug reports, or questions about your speed test results."
         canonicalPath="/contact"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

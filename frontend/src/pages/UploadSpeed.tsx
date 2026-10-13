@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpFromLine, ArrowRight } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -20,6 +21,8 @@ export function UploadSpeed() {
         description="Upload speed explained: what it measures, how many Mbps you need for video calls, cloud backup, and livestreaming, and why it matters as much as download speed."
         canonicalPath="/upload-speed"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

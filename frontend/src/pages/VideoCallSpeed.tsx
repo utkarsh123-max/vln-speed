@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Video, ArrowRight } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -20,6 +21,8 @@ export function VideoCallSpeed() {
         description="How much download and upload speed you need for smooth Zoom, Google Meet, and Teams calls — including group calls and screen sharing."
         canonicalPath="/video-call-speed"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ShieldCheck, Cookie, Database, ServerCog, Eye, Megaphone } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -35,6 +36,8 @@ export function Privacy() {
         description="VLN Speed's privacy policy: what data is collected during a speed test, how cookies and advertising work on this site, and your choices."
         canonicalPath="/privacy"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { FileText } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -39,6 +40,8 @@ export function Terms() {
         description="Terms and conditions for using VLN Speed's internet speed testing tool, including acceptable use, accuracy limitations, and service availability."
         canonicalPath="/terms"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

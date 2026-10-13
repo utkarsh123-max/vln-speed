@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowDownToLine, ArrowRight } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -20,6 +21,8 @@ export function DownloadSpeed() {
         description="Download speed explained: what it measures, how many Mbps you actually need for streaming, gaming, and video calls, and why it's usually higher than upload speed."
         canonicalPath="/download-speed"
       />
+
+      <BackButton />
 
       <motion.div
         initial={{ opacity: 0, y: 14 }}

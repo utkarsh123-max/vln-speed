@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { HelpCircle, ChevronDown } from "lucide-react";
 import { Seo, JsonLd } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -100,6 +101,8 @@ export function Faq() {
         description="Answers to common questions about internet speed tests: accuracy, Mbps vs MB/s, ping, Wi-Fi vs Ethernet, VPNs, and why your speed changes."
         canonicalPath="/faq"
       />
+
+      <BackButton />
       <JsonLd id="faq-page" data={schema} />
 
       <motion.div

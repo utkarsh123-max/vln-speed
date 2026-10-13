@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Radio, ArrowLeftRight, ShieldCheck, Sparkles, Check, Target } from "lucide-react";
 import { Seo } from "../components/Seo/Seo";
+import { BackButton } from "../components/BackButton/BackButton";
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -37,6 +38,8 @@ export function About() {
         description="VLN Speed is a free internet speed test that measures real download, upload, ping and jitter — no fake numbers, no hidden formulas. Learn how it works."
         canonicalPath="/about"
       />
+
+      <BackButton />
 
       <div className="max-w-2xl mx-auto px-5 sm:px-8 pt-14 sm:pt-20 pb-16">
         <motion.div
