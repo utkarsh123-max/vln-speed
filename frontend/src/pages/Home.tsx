@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import {
   Activity,
   Gauge as GaugeIcon,
@@ -7,6 +8,12 @@ import {
   ArrowDownToLine,
   ArrowUpFromLine,
   Sparkles,
+  ArrowRight,
+  Gamepad2,
+  Tv,
+  Video,
+  Wrench,
+  BookOpen,
 } from "lucide-react";
 import { SpeedGauge } from "../components/SpeedGauge/SpeedGauge";
 import { SpeedChart } from "../components/SpeedChart/SpeedChart";
@@ -41,6 +48,27 @@ const PHASE_STATUS: Record<string, string> = {
 };
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
+
+const HOW_IT_WORKS = [
+  { icon: Radio, title: "Find Server", desc: "Connects to the fastest available test server near you." },
+  { icon: Activity, title: "Ping Test", desc: "Measures round-trip latency between you and the server." },
+  { icon: ArrowDownToLine, title: "Download Test", desc: "Streams real data to measure your download throughput." },
+  { icon: ArrowUpFromLine, title: "Upload Test", desc: "Sends real data to measure your upload throughput." },
+];
+
+const LEARN_CARDS = [
+  { icon: BookOpen, title: "Internet Speed Guide", desc: "Understand Mbps, Wi-Fi vs Ethernet, and what your ISP really promises.", to: "/internet-speed-guide" },
+  { icon: ArrowDownToLine, title: "Download Speed", desc: "What download speed means and how much you actually need.", to: "/download-speed" },
+  { icon: ArrowUpFromLine, title: "Upload Speed", desc: "Why upload speed matters more than most people think.", to: "/upload-speed" },
+  { icon: Activity, title: "Ping & Latency", desc: "Why low ping matters, even on a fast connection.", to: "/ping-latency" },
+];
+
+const USE_CASES = [
+  { icon: Gamepad2, title: "Gaming", desc: "Low ping and jitter targets for smooth, lag-free gameplay.", to: "/gaming-internet-speed" },
+  { icon: Tv, title: "Streaming", desc: "Mbps needed for HD, 4K, and multiple simultaneous streams.", to: "/streaming-internet-speed" },
+  { icon: Video, title: "Video Calls", desc: "Upload and download needs for smooth group calls.", to: "/video-call-speed" },
+  { icon: Wrench, title: "Troubleshooting", desc: "A step-by-step checklist when your speed feels off.", to: "/troubleshooting" },
+];
 
 export function Home() {
   const [server, setServer] = useState<ServerInfo>(DEFAULT_SERVER);
@@ -307,6 +335,132 @@ export function Home() {
           </motion.section>
         )}
       </AnimatePresence>
+
+      {/* Learn more — always visible, below the test */}
+      <section className="max-w-5xl mx-auto px-5 sm:px-8 mt-20 pb-20 flex flex-col gap-16">
+        {/* How it works */}
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: easeOut }}
+        >
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gradient">
+              How does this speed test work?
+            </h2>
+            <p className="text-secondary text-sm sm:text-base mt-3 max-w-xl mx-auto">
+              VLN Speed measures your real connection in four stages — no estimates, no guesswork.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {HOW_IT_WORKS.map((step, i) => (
+              <motion.div
+                key={step.title}
+                initial={reducedMotion ? false : { opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.08, ease: easeOut }}
+                whileHover={reducedMotion ? undefined : { y: -3 }}
+                className="card-premium rounded-2xl p-5 text-center"
+              >
+                <div className="w-10 h-10 rounded-xl bg-elevated ring-hairline flex items-center justify-center mx-auto mb-3 text-accent">
+                  <step.icon size={18} />
+                </div>
+                <p className="text-[10px] font-semibold text-muted uppercase tracking-wider mb-1">Step {i + 1}</p>
+                <h3 className="text-sm font-bold text-primary mb-1.5">{step.title}</h3>
+                <p className="text-xs text-secondary leading-relaxed">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-6">
+            <Link
+              to="/how-speed-test-works"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:underline"
+            >
+              Learn more about how it works <ArrowRight size={14} />
+            </Link>
+          </div>
+        </motion.div>
+
+        {/* Learn more guides */}
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: easeOut }}
+        >
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gradient">
+              Know your terms
+            </h2>
+            <p className="text-secondary text-sm sm:text-base mt-3 max-w-xl mx-auto">
+              A quick primer on the numbers your speed test shows you.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {LEARN_CARDS.map((card, i) => (
+              <motion.div
+                key={card.title}
+                initial={reducedMotion ? false : { opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.08, ease: easeOut }}
+                whileHover={reducedMotion ? undefined : { y: -3 }}
+              >
+                <Link to={card.to} className="block h-full card-premium rounded-2xl p-5 hover:shadow-glow transition-shadow">
+                  <div className="w-10 h-10 rounded-xl bg-elevated ring-hairline flex items-center justify-center mb-3 text-accent">
+                    <card.icon size={18} />
+                  </div>
+                  <h3 className="text-sm font-bold text-primary mb-1.5">{card.title}</h3>
+                  <p className="text-xs text-secondary leading-relaxed">{card.desc}</p>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Use cases */}
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, ease: easeOut }}
+        >
+          <div className="text-center mb-10">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gradient">
+              What speed do you actually need?
+            </h2>
+            <p className="text-secondary text-sm sm:text-base mt-3 max-w-xl mx-auto">
+              Different activities need different speeds. Find out what applies to you.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {USE_CASES.map((item, i) => (
+              <motion.div
+                key={item.title}
+                initial={reducedMotion ? false : { opacity: 0, y: 14 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45, delay: i * 0.08, ease: easeOut }}
+                whileHover={reducedMotion ? undefined : { y: -3 }}
+              >
+                <Link to={item.to} className="block h-full card-premium rounded-2xl p-5 text-center hover:shadow-glow transition-shadow">
+                  <div className="w-10 h-10 rounded-xl bg-elevated ring-hairline flex items-center justify-center mx-auto mb-3 text-accent">
+                    <item.icon size={18} />
+                  </div>
+                  <h3 className="text-sm font-bold text-primary mb-1.5">{item.title}</h3>
+                  <p className="text-xs text-secondary leading-relaxed">{item.desc}</p>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+      </section>
     </div>
   );
 }

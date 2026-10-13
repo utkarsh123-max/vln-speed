@@ -9,10 +9,11 @@ interface SpeedGaugeProps {
   reducedMotion?: boolean;
 }
 
-const SWEEP_DEG = 270;
-const START_DEG = 135;
-const RADIUS = 128;
-const CENTER = 160;
+const SWEEP_DEG = 250;
+const START_DEG = 145;
+const RADIUS = 118;
+const CENTER = 170;
+const VIEWBOX = 340;
 
 /**
  * Rounds up to a clean scale ceiling so the gauge always has
@@ -96,19 +97,19 @@ export function SpeedGauge({
   const activeArcOffset = arcLength - arcLength * fraction;
 
   /*
-   * Major ticks.
+   * Major ticks — fewer, better spaced, Ookla-style.
    */
   const ticks = useMemo(() => {
-    const majorCount = 9;
+    const majorCount = 6;
 
     return Array.from({ length: majorCount }, (_, i) => {
       const angle = START_DEG + (SWEEP_DEG * i) / (majorCount - 1);
 
       const labelValue = Math.round((maxScale * i) / (majorCount - 1));
 
-      const outer = polarPoint(RADIUS + 14, angle);
-      const inner = polarPoint(RADIUS + 4, angle);
-      const labelPos = polarPoint(RADIUS + 30, angle);
+      const outer = polarPoint(RADIUS + 12, angle);
+      const inner = polarPoint(RADIUS + 3, angle);
+      const labelPos = polarPoint(RADIUS + 28, angle);
 
       return {
         angle,
@@ -124,13 +125,13 @@ export function SpeedGauge({
    * Minor ticks.
    */
   const minorTicks = useMemo(() => {
-    const minorCount = 45;
+    const minorCount = 36;
 
     return Array.from({ length: minorCount }, (_, i) => {
       const angle = START_DEG + (SWEEP_DEG * i) / (minorCount - 1);
 
-      const outer = polarPoint(RADIUS + 10, angle);
-      const inner = polarPoint(RADIUS + 4, angle);
+      const outer = polarPoint(RADIUS + 9, angle);
+      const inner = polarPoint(RADIUS + 3, angle);
 
       return {
         angle,
@@ -141,13 +142,11 @@ export function SpeedGauge({
   }, []);
 
   /*
-   * Indicator position.
-   *
-   * This intentionally remains derived from the current measured value,
-   * while Framer Motion handles the visual interpolation.
+   * Needle tip — the actual rotating pointer, Ookla-style.
+   * Rests at the "0" position when idle and sweeps to the live value.
    */
-  const indicatorPoint = useMemo(
-    () => polarPoint(RADIUS - 2, START_DEG + SWEEP_DEG * fraction),
+  const needleTip = useMemo(
+    () => polarPoint(RADIUS - 20, START_DEG + SWEEP_DEG * fraction),
     [fraction]
   );
 
@@ -181,7 +180,7 @@ export function SpeedGauge({
       />
 
       <svg
-        viewBox="0 0 320 320"
+        viewBox={`0 0 ${VIEWBOX} ${VIEWBOX}`}
         width={size}
         height={size}
         role="img"
@@ -275,7 +274,8 @@ export function SpeedGauge({
             <text
               x={tick.labelPos.x}
               y={tick.labelPos.y}
-              fontSize={9}
+              fontSize={11}
+              fontWeight={600}
               fill="var(--vln-text-muted)"
               textAnchor="middle"
               dominantBaseline="middle"
@@ -303,17 +303,22 @@ export function SpeedGauge({
           transition={reducedMotion ? { duration: 0 } : { type: "spring", stiffness: 90, damping: 20 }}
         />
 
-        {/* Position indicator */}
-        {value > 0 && (
-          <motion.circle
-            r={5}
-            fill="var(--vln-accent)"
-            filter={`url(#${glowId})`}
-            initial={{ cx: indicatorPoint.x, cy: indicatorPoint.y }}
-            animate={{ cx: indicatorPoint.x, cy: indicatorPoint.y }}
-            transition={reducedMotion ? { duration: 0 } : { type: "spring", stiffness: 90, damping: 20 }}
-          />
-        )}
+        {/* Needle — rotates from the "0" rest position to the live value */}
+        <motion.line
+          x1={CENTER}
+          y1={CENTER}
+          stroke="var(--vln-accent)"
+          strokeWidth={3}
+          strokeLinecap="round"
+          filter={`url(#${glowId})`}
+          initial={false}
+          animate={{ x2: needleTip.x, y2: needleTip.y }}
+          transition={reducedMotion ? { duration: 0 } : { type: "spring", stiffness: 90, damping: 20 }}
+        />
+
+        {/* Needle hub */}
+        <circle cx={CENTER} cy={CENTER} r={7} fill="var(--vln-accent)" stroke="var(--vln-elevated)" strokeWidth={2} />
+        <circle cx={CENTER} cy={CENTER} r={2.5} fill="var(--vln-elevated)" />
       </svg>
 
       {/* Center readout */}
