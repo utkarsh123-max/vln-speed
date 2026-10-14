@@ -256,3 +256,54 @@ export async function runUploadTest(
   const elapsedSec = (performance.now() - testStart) / 1000;
   return summarize(sampler.samples, totalBytes, elapsedSec);
 }
+// ---- loaded latency (bufferbloat) ---------------------------------------
+
+/**
+ * Measures ping latency WHILE a download/upload is in flight. A big gap
+ * between this and the idle ping (measured before the transfer started)
+ * reveals "bufferbloat" — your router/ISP queueing so much data that other
+ * traffic (a game, a video call) stalls even though your raw Mbps number
+ * looks fine. This is the same idea Fast.com's "loaded latency" shows.
+ */
+export async function runLoadedPingTest(
+  baseUrl: string,
+  opts: {
+    durationMs?: number;
+    intervalMs?: number;
+    onSample?: (rttMs: number) => void;
+    signal?: AbortSignal;
+  } = {}
+): Promise<PingSummary> {
+  const durationMs = opts.durationMs ?? 6000;
+  const intervalMs = opts.intervalMs ?? 400;
+  const samples: number[] = [];
+  const testStart = performance.now();
+
+  while (performance.now() - testStart < durationMs) {
+    if (opts.signal?.aborted) break;
+    const start = performance.now();
+    try {
+      await fetch(`${baseUrl}/api/ping?_=${Date.now()}_${samples.length}`, {
+        cache: "no-store",
+        signal: opts.signal,
+      });
+      const rtt = performance.now() - start;
+      samples.push(rtt);
+      opts.onSample?.(rtt);
+    } catch {
+      // dropped sample under load — itself meaningful (congestion), not fatal
+    }
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+
+  if (samples.length === 0) {
+    return { minMs: 0, avgMs: 0, jitterMs: 0, samples: [] };
+  }
+
+  return {
+    minMs: Math.min(...samples),
+    avgMs: calculateAverage(samples),
+    jitterMs: calculateJitter(samples),
+    samples,
+  };
+}
