@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { HomeShowcase } from "../components/HomeShowcase/HomeShowcase";
 import {
   Activity,
   Gauge as GaugeIcon,
@@ -335,7 +336,7 @@ export function Home() {
           </motion.section>
         )}
       </AnimatePresence>
-
+      <HomeShowcase />
       {/* Learn more — always visible, below the test */}
       <section className="max-w-5xl mx-auto px-5 sm:px-8 mt-20 pb-20 flex flex-col gap-16">
         {/* How it works */}
